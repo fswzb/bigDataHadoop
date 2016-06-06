@@ -1,0 +1,56 @@
+****** You can submit jobs to oozie via the command ******
+
+oozie job -oozie http://woozie-server.local:11000/oozie -config <your config file> -run
+
+oozie job -oozie oozie-url -D 'oozie.wf.application.path=${appPath}/app-workflow.xml' -config [path]job.devtest.properties -run
+
+****** Some useful command
+
+0.check your oozie version
+oozie version
+Oozie client build version: 4.2.0.2.3.2.0-2950
+
+1.check oozie status
+oozie admin -oozie http://worker1.nmobile.local:11000/oozie -status
+
+[jason@master1 ~]$ oozie admin -oozie http://worker1.nmobile.local:11000/oozie -status
+System mode: NORMAL
+[jason@master1 ~]$
+
+2.run a oozie job
+oozie job -oozie http://worker1.nmobile.local:11000/oozie -config /home/jason/installation/dataapp/job.properties -run
+
+3.check job status
+check info and log 
+oozie job -oozie http://worker1.nmobile.local:11000/oozie/ -info 0001224-150210230244102-oozie-oozi-W
+oozie job -oozie http://worker1.nmobile.local:11000/oozie/ -log 0001224-150210230244102-oozie-oozi-W
+
+4. kill oozie job
+oozie job -oozie http://worker1.nmobile.local::11000/oozie/ -log job-id
+
+
+****** Neutron Mobile dev/test cluster oozie config
+oozie config in "/etc/hadoop/conf/core-site.xml"
+    <property>
+      <name>hadoop.proxyuser.oozie.groups</name>
+      <value>*</value>
+    </property>
+
+    <property>
+      <name>hadoop.proxyuser.oozie.hosts</name>
+      <value>worker1.nmobile.local</value>
+    </property>
+
+****** oozie lib folder oozie.libpath
+hdfs dfs -ls /user/oozie/share/lib/lib_20150421001652/
+Found 8 items
+drwxr-xr-x   - oozie hadoop          0 2015-04-21 00:17 /user/oozie/share/lib/lib_20150421001652/distcp
+drwxr-xr-x   - oozie hadoop          0 2015-04-21 00:17 /user/oozie/share/lib/lib_20150421001652/hcatalog
+drwxr-xr-x   - oozie hadoop          0 2015-04-21 00:17 /user/oozie/share/lib/lib_20150421001652/hive
+drwxr-xr-x   - oozie hadoop          0 2015-04-21 00:17 /user/oozie/share/lib/lib_20150421001652/mapreduce-streaming
+drwxr-xr-x   - oozie hadoop          0 2015-04-21 00:17 /user/oozie/share/lib/lib_20150421001652/oozie
+drwxr-xr-x   - oozie hadoop          0 2015-04-21 00:16 /user/oozie/share/lib/lib_20150421001652/pig
+-rw-r--r--   3 oozie hadoop       1390 2015-04-21 00:17 /user/oozie/share/lib/lib_20150421001652/sharelib.properties
+drwxr-xr-x   - oozie hadoop          0 2015-09-24 20:30 /user/oozie/share/lib/lib_20150421001652/sqoop
+
+   

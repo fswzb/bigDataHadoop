@@ -1,0 +1,32 @@
+Step 1: Create a HBase table ‘stockYahoo’ with column_family ‘stockYahoo_data’ from HBase shell.
+
+# Enter into HBase shell
+
+[cloudera@quickstart guan01]$ hbase shell
+# Create a table ‘stockYahoo’ with column family ‘stockYahoo_data’
+
+hbase(main):001:0> create 'stockYahooImportTsv', 'stockYahoo_data'
+# List the tables
+
+hbase(main):002:0> list
+# Exit from HBase shell
+
+hbase(main):003:0> exit
+
+
+Step 2: Use the importtsv to load data into the 'stockYahooImportTsv' table in HBase
+
+-- Load dataset 'yahooFinance.csv' from HDFS location
+
+-- we shall now execute the Loadtsv statement as following outside hbase
+
+hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.separator=, -Dimporttsv.columns="HBASE_ROW_KEY,stockYahoo_data:open,stockYahoo_data:high,stockYahoo_data:low,stockYahoo_data:close,stockYahoo_data:volumn,stockYahoo_data:adjClose" stockYahooImportTsv /user/guan01/pig/yahooFinance.csv
+
+# use deleteall to delete the whole role, delete the first row (header)
+deleteall 'stockYahooImportTsv', 'Date'
+
+
+Step 3: Enter HBase shell and verify the data in the ‘stockYahoo’ table.
+hbase(main):001:0> count 'stockYahoo'
+hbase(main):002:0> scan 'stockYahoo'
+hbase(main):003:0> scan 'stockYahoo', {'LIMIT' => 5}

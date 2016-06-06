@@ -1,0 +1,146 @@
+****** hbase commands ******
+
+hbase(main):007:0> version
+
+hbase(main):001:0> zk_dump
+HBase is rooted at /hbase-unsecure
+Active master address: worker1.nmobile.local,16000,1462421965593
+Backup master addresses:
+Region server holding hbase:meta: worker2.nmobile.local,16020,1462422078240
+Region servers:
+ worker3.nmobile.local,16020,1462422065257
+ worker2.nmobile.local,16020,1462422078240
+ worker5.nmobile.local,16020,1462422080262
+ worker6.nmobile.local,16020,1462422077359
+ worker4.nmobile.local,16020,1462422079381
+
+
+
+hbase(main):004:0> scan 'hbase:meta'
+ROW                            COLUMN+CELL                                                                          
+ Students,,1447204030379.3becf column=info:regioninfo, timestamp=1447204030868, value={ENCODED => 3becf52d45c3fc7aca
+ 52d45c3fc7acab6550ea918c673.  b6550ea918c673, NAME => 'Students,,1447204030379.3becf52d45c3fc7acab6550ea918c673.', 
+                               STARTKEY => '', ENDKEY => ''}                                                        
+ Students,,1447204030379.3becf column=info:seqnumDuringOpen, timestamp=1462422102285, value=\x00\x00\x00\x00\x00\x00
+ 52d45c3fc7acab6550ea918c673.  \x00\x10                                                                             
+ Students,,1447204030379.3becf column=info:server, timestamp=1462422102285, value=worker5.nmobile.local:16020       
+ 52d45c3fc7acab6550ea918c673.               
+
+
+
+*** Create new table
+
+create 'test_guan', 'testcf'
+create 'usertable', 'map data', 'action data'
+
+1. create table
+create 'usertable', 'map data', 'action data'
+
+hbase> create ‘t1', {NAME => ‘f1', VERSIONS => 5}
+hbase> create ‘t1', {NAME => ‘f1'}, {NAME => ‘f2'}, {NAME => ‘f3'}
+hbase> # The above in shorthand would be the following:
+hbase> create ‘t1', ‘f1', ‘f2', ‘f3'
+hbase> create ‘t1', {NAME => ‘f1', VERSIONS => 1, TTL => 2592000, BLOCKCACHE => true}
+hbase> create ‘t1', {NAME => ‘f1', CONFIGURATION => {‘hbase.hstore.blockingStoreFiles’ => ’10’}}
+
+***list all tables
+hbase(main):001:0> list
+TABLE
+test_guan
+1 row(s) in 0.3770 seconds
+
+=> ["test_guan"]
+hbase(main):002:0>
+
+*** status
+hbase(main):004:0> status 'test_guan'
+5 servers, 0 dead, 0.6000 average load
+
+
+2. disable a table before alter or delete
+disalbe 'usertable'
+
+3, ebable table
+enable 'usertable'
+
+4.drop a table
+drop 'usertable'
+
+5. populate data
+put 'usertable','1001','map data:x','100'
+put 'usertable','1001','map data:y','100'
+
+
+6. query on a table
+count 'usertable'
+
+hhbase(main):019:0> get 'usertable','1001'
+COLUMN                            CELL
+ map data:x                       timestamp=1456603695421, value=100
+ map data:y                       timestamp=1456603728677, value=100
+2 row(s) in 0.0430 seconds
+
+
+7. table reference
+t1 = get_table 'usertable'
+t1.get'1001'
+
+hbase(main):003:0> t1.get'1001'
+COLUMN                            CELL
+ map data:x                       timestamp=1456603695421, value=100
+ map data:y                       timestamp=1456603728677, value=100
+2 row(s) in 0.3290 seconds
+
+
+8. exit hbase shell
+quit
+
+9. reading hbase table
+
+scan 'test_guan_student', {'LIMIT' => 5}
+
+10. describe table
+hbase(main):004:0> describe 'test_guan_student'
+Table test_guan_student is ENABLED
+test_guan_student
+COLUMN FAMILIES DESCRIPTION
+{NAME => 'student2', BLOOMFILTER => 'ROW', VERSIONS => '1', IN_MEMORY => 'false', KEEP_DELETED_CELLS => 'FALSE', DATA_BLOCK_
+ENCODING => 'NONE', TTL => 'FOREVER', COMPRESSION => 'NONE', MIN_VERSIONS => '0', BLOCKCACHE => 'true', BLOCKSIZE => '65536'
+, REPLICATION_SCOPE => '0'}
+1 row(s) in 0.0920 seconds
+
+11. habse shell filters
+
+hbase(main):002:0> show_filters
+Documentation on filters mentioned below can be found at: https://our.intern.facebook.com/intern/wiki/index.php/HBase/Filter_Language
+ColumnPrefixFilter
+TimestampsFilter
+PageFilter
+MultipleColumnPrefixFilter
+FamilyFilter
+ColumnPaginationFilter
+SingleColumnValueFilter
+RowFilter
+QualifierFilter
+ColumnRangeFilter
+ValueFilter
+PrefixFilter
+SingleColumnValueExcludeFilter
+ColumnCountGetFilter
+InclusiveStopFilter
+DependentColumnFilter
+FirstKeyOnlyFilter
+KeyOnlyFilter
+
+hbase(main):003:0> scan 'vc_rio_reff',{FILTER => "ColumnPrefixFilter('pii_safety')"}
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/hdp/2.2.4.2-2/hadoop/lib/slf4j-log4j12-1.7.5.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/hdp/2.2.4.2-2/zookeeper/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+ROW                                              COLUMN+CELL
+ http://fake.bigphish.us                         column=Reputation:pii_safety, timestamp=1443226038346, value=\xCE
+ http://www.phishy.ly                            column=Reputation:pii_safety, timestamp=1443228881424, value=\xCE
+2 row(s) in 2.0830 seconds
+
+hbase(main):004:0>
+

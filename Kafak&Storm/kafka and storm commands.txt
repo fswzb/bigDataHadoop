@@ -1,0 +1,33 @@
+****** kafka commands
+
+****** list topics
+/usr/hdp/current/kafka-broker/bin/kafka-topics.sh --list --zookeeper master1.nmobile.local:2181
+
+****** describe a topic
+/usr/hdp/current/kafka-broker/bin/kafka-topics.sh --zookeeper master1.nmobile.local:2181 --describe --topic test_jason_test3
+
+
+****** Create Kafka topic
+/usr/hdp/current/kafka-broker/bin/kafka-topics.sh --zookeeper master1.nmobile.local:2181 --create --topic test_jason_test3 --replication-factor 1 --partitions 2
+
+****** produce some msg for test
+/usr/hdp/current/kafka-broker/bin/kafka-console-producer.sh --broker-list master1.nmobile.local:6667 --topic test_jason_test3 
+
+****** read the message from consumer
+/usr/hdp/current/kafka-broker/bin/kafka-console-consumer.sh --zookeeper master1.nmobile.local:2181 --topic test_jason_test3 
+
+#run storm
+storm jar stormappdemo-0.0.1.jar com.neutronmobile.KafkaTopology
+
+storm jar stormappdemo-0.0.1.jar com.neutronmobile.ExclamationTopology jason_torm_test
+
+#kill storm
+kill a cluster run
+storm kill com.neutronmobile.KafkaTopology -w 5
+
+storm kill jason-hbase-storm -w 5
+
+
+kill a local run
+ctrl + C
+

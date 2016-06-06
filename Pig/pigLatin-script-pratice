@@ -1,0 +1,66 @@
+/*
+pigLatin script
+*/
+
+--load data (HDFS path)
+users = LOAD '/user/guan01/data/users.tsv' AS (id: chararray,gender: chararray,age: int,country: chararray,registered: chararray);
+sites = LOAD '/user/guan01/data/sites.csv' USING PigStorage(',') AS (site:chararray, count:int, rank:float);
+
+--load data with complex type
+
+--dump
+dump users;
+
+--store
+store users into '/user/guan01/data/users_temp'
+
+--filter
+usersWithGender = FILTER users by gender is not null;
+dump usersWithGender;
+
+--foreach generate
+usersAfter2Year = foreach users generate (id,gender,age + 2, country,registered);
+dump usersAfter2Year;
+
+--distinct
+usersGender = foreach users generate gender;
+usersDiscGender = distinct usersGender;
+dump usesDiscGender;
+
+
+--sampling data
+book = LOAD '/user/guan01/data/Scala_for_the_Impatient.txt';
+shortBook = SAMPLE book 0.01;
+store shortBook into '/user/guan01/data/shortbook';
+
+--group 
+genderGroup =  group users by gender;
+dump genderGroup;
+
+genderCount = foreach genderGroup generate COUNT(users), group;
+dump genderCount;
+
+--inner join
+username = load '/user/guan01/data/username.tsv' AS (id: chararray, name: chararray);
+userInfo = join users by $0, username by $0;
+dump userInfo;
+
+--outer join
+userInfoLeft = join users by $0 left outer, username by $0;
+
+--order
+userOrder = order users by age desc;
+top10  = limit userOrder 10;
+
+
+--limit
+user6 = limit users 6;
+dump users6;
+
+--unoin
+users2 = load '/user/guan01/data/users2.tsv' as (id: chararray,gender: chararray,age: int,country: chararray,registered: chararray);
+userAll = union users2, users;
+dump uerAll;
+
+--split
+split userAll into group1 if age < 24, group2 if age >= 24, group3 if age is null;

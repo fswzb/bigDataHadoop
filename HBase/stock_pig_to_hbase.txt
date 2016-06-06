@@ -1,0 +1,53 @@
+Step 1: Create a HBase table ‘stockYahoo’ with column_family ‘stockYahoo_data’ from HBase shell.
+
+# Enter into HBase shell
+
+[cloudera@quickstart guan01]$ hbase shell
+# Create a table ‘stockYahoo’ with column family ‘stockYahoo_data’
+
+hbase(main):001:0> create 'stockYahoo', 'stockYahoo_data'
+# List the tables
+
+hbase(main):002:0> list
+# Exit from HBase shell
+
+hbase(main):003:0> exit
+
+
+Step 2: Use the following PIG script to load data into the 'stockYahoo' table in HBase
+
+-- Load dataset 'yahooFinance.csv' from HDFS location
+
+-- Run the below script inside pig and STORE raw_data INTO 'hbase://stockYahoo'
+
+REGISTER '/home/guan01/piggybank.jar';
+raw_data = LOAD '/user/guan01/pig/yahooFinance.csv' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',', 'NO_MULTILINE', 'UNIX', 'SKIP_INPUT_HEADER') AS (date: chararray, open: float, high: float, low: float, close: float, volumn: float, adjClose: float);
+
+-- To dump the data from PIG Storage to stdout
+/* dump raw_data; */
+
+-- Use HBase storage handler to map data from PIG to HBase
+--NOTE: In this case, date (first unique column) will be considered as row key.
+
+STORE raw_data INTO 'hbase://stockYahoo' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage(
+'stockYahoo_data:open 
+ stockYahoo_data:high 
+ stockYahoo_data:low 
+ stockYahoo_data:close
+ stockYahoo_data:volumn 
+ stockYahoo_data:adjClose'
+);
+
+Step 3: Optional
+-- save the script from step 2，and name the script from step 2 'Load_HBase_stockYahoo.pig'
+-- Run the PIG Script (Load_HBase_Customers.pig) 
+
+PIG_CLASSPATH=/usr/lib/hbase/hbase-common.jar:/usr/lib/zookeeper/zookeeper-3.4.5-cdh5.7.0.jar 
+PIG_CLASSPATH=/usr/lib/pig.jar
+pig -x local /home/guan01/Load_HBase_stockYahoo.pig
+
+
+Step 4: Enter HBase shell and verify the data in the ‘stockYahoo’ table.
+hbase(main):001:0> count 'stockYahoo'
+hbase(main):002:0> scan 'stockYahoo'
+hbase(main):003:0> scan 'stockYahoo', {'LIMIT' => 5}

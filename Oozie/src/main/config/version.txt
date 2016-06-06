@@ -1,0 +1,4 @@
+groupId = com.neutronmobile.app
+artifactId = oozie-application
+version = 1.0.0
+timestamp = 20160101-0051

@@ -1,0 +1,19 @@
+<coordinator-app name="App_Coordinator"
+   frequency="${coord:hours(24)}"
+   start="${startTime}"
+   end="${endTime}"
+   timezone="${timeZoneDef}"
+   xmlns="uri:oozie:coordinator:0.1"
+   xmlns:sla="uri:oozie:sla:0.1">
+   <controls>
+     <timeout>300</timeout>
+     <concurrency>1</concurrency>
+     <execution>FIFO</execution>
+   </controls>
+   <action>
+     <workflow>
+       <app-path>${WorkflowAppPath}</app-path>
+     </workflow>
+   </action>
+</coordinator-app>
+

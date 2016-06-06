@@ -1,0 +1,267 @@
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="Production_Run">
+<global>
+	<configuration>
+    	<property>
+       		<name>mapreduce.job.queuename</name>
+       		<value>${queueName}</value>
+     	</property>
+ 	</configuration>
+</global>
+<start to="CreateDirs"/>    
+<action name="CreateDirs">
+	<fs>       
+    	<delete path='${prod_output_dir}'/>
+        <mkdir path='${prod_output_dir}'/>    
+     </fs>
+     <ok to="CopyIPFilterData"/>
+     <error to="FailureNotification"/>
+</action>
+<action name="CopyBookData">
+	<distcp xmlns="uri:oozie:distcp-action:0.1">
+     	<job-tracker>${jobTracker}</job-tracker>
+       	<name-node>${nameNode}</name-node>
+        <arg>${book_source_data}</arg>
+        <arg>${book_target_dir}</arg>
+     </distcp>
+     <ok to="PopulateBookData"/>
+     <error to="FailureNotification"/>
+</action>  
+<action name="PopulateBookData">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <job-xml>app-hive-conf.xml</job-xml>
+        <script>${appPath}/hive/populate_book_data.hql</script>
+        <param>app_db=${app_db}</param>
+        <param>book_target_dir=${book_target_dir}</param>
+	</hive>
+    <ok to="ComputeFeatures"/>
+    <error to="FailureNotification"/>
+</action>
+<fork name="ComputeFeatures">
+	<path start="BookRandomScoreFeatures"/>
+    <path start="OrderAgeFeatures"/>
+    <path start="BuyerAgeFeatures"/>
+    <path start="BuyerCountFeatures"/>
+    <path start="BuyerBookCountFeatures"/>
+    <path start="BookUsageFeatures"/>
+    <path start="VenderFeatures"/>
+    <path start="PricingFeatures"/>
+    <path start="CategoryFeatures"/>
+</fork>
+<action name="BookRandomScoreFeatures">
+ 	<hive xmlns="uri:oozie:hive-action:0.3">
+    	<job-tracker>${jobTracker}</job-tracker>
+    	<name-node>${nameNode}</name-node>
+    	<job-xml>hive-site.xml</job-xml>
+    	<job-xml>app-hive-site.xml</job-xml>
+   	 	<script>${appPath}/hive/compute_BookRandomScoreFeatures.hql</script>
+ 	</hive>
+    <ok to="CompositeFeatures"/>
+    <error to="FailureNotification"/>
+</action> 
+<action name="OrderAgeFeatures">
+ 	<hive xmlns="uri:oozie:hive-action:0.3">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+		<job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_OrderAgeFeatures.hql</script>
+	</hive>
+    <ok to="CompositeFeatures"/>
+    <error to="FailureNotification"/>
+</action>
+<action name="BuyerCountFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+		<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_BuyerCountFeatures.hql</script>
+	</hive>
+    <ok to="CompositeFeatures"/>
+    <error to="FailureNotification"/>
+</action>  
+<action name="BuyerBookCountFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+		<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_BuyerBookCountFeatures.hql</script>
+	</hive>
+    <ok to="CompositeFeatures"/>
+    <error to="FailureNotification"/>
+</action>
+<action name="BookUsageFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_BookUsageFeatures.hql</script>
+	</hive>
+    <ok to="CompositeFeatures"/>
+    <error to="FailureNotification"/>
+</action>  
+<action name="VenderFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+		<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_VenderFeatures.hql</script>
+	</hive>
+    <ok to="CompositeFeatures"/>
+    <error to="FailureNotification"/>
+</action> 
+<action name="PricingFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+		<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_PricingFeatures.hql</script>
+	</hive>
+    <ok to="CompositeFeatures"/>
+    <error to="FailureNotification"/>
+</action>
+<action name="CategoryFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+		<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_CategoryFeatures.hql</script>
+	</hive>
+    <ok to="CompositeFeatures"/>
+    <error to="FailureNotification"/>
+</action>
+<join name="CompositeFeatures" to="CompositeFeatureComputation"/>
+<fork name="CompositeFeatureComputation">
+	<path start="BookFeatures"/>
+    <path start="VenderFeatures"/>
+    <path start="UserFeatures"/>
+</fork>
+<action name="BookFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+		<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_BookFeatures.hql</script>
+	</hive>
+	<ok to="ComputeFeatureVector"/>
+	<error to="FailureNotification"/>
+</action>
+<action name="VenderFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_VenderFeatures.hql</script>
+	</hive>
+	<ok to="ComputeFeatureVector"/>
+	<error to="FailureNotification"/>
+</action>
+<action name="UserFeatures">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/compute_UserFeatures.hql</script>
+        <param>app_db=${app_db}</param>
+	</hive>
+    <ok to="ComputeFeatureVector"/>
+    <error to="FailureNotification"/>
+</action>
+<join name="ComputeFeatureVector" to="FeatureVector"/>
+<action name="FeatureVector">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+		<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+    	<job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/construct_features_table.hql</script>
+        <param>app_db=${app_db}</param>
+	</hive>
+	<ok to="ExecuteExperimentalRules"/>
+	<error to="FailureNotification"/>
+</action>                       
+<action name="ExecuteExperimentalRules">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/experimental_rules.hql</script>
+        <param>app_db=${app_db}</param>
+	</hive>
+	<ok to="ComputeExperimentalMetrics"/>
+	<error to="FailureNotification"/>
+</action>
+<action name="ComputeExperimentalMetrics">
+	<hive xmlns="uri:oozie:hive-action:0.2">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/ExperimentalMetrics.hql</script>
+        <param>app_db=${app_db}</param>
+	</hive>
+    <ok to="SanityCheck"/>
+    <error to="FailureNotification"/>
+</action>
+<decision name="SanityCheck">
+	<switch>
+		<case to="SanityCheckFailureNotification">
+        	${fs:dirSize(ExperimentalMetrics) gt 0}
+        </case>
+        <case to="PerformBookClassification">
+        	${fs:dirSize(ExperimentalMetrics) eq 0}
+        </case>
+        <default to="PerformBookClassification"/>
+	</switch>
+</decision>
+<action name="PerformBookClassification">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <job-xml>hive-site.xml</job-xml>
+        <script>${appPath}/hive/book_classification.hql</script>
+        <param>app_db=${app_db}</param>
+	</hive>
+	<ok to="PostToProdServer"/>
+    <error to="FailureNotification"/>
+</action>
+<action name="PostToProdServer">
+	<sqoop xmlns="uri:oozie:sqoop-action:0.2">
+    	<job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+        	<property>
+            	<name>mapred.job.queue.name</name>
+                <value>${queueName}</value>
+            </property>
+        </configuration>
+        <arg>export</arg>
+        <arg>--options-file</arg>
+        <arg>${optionFileBook}</arg>
+        <file>${optionFileBook}</file>
+ 	</sqoop>
+    <ok to="end"/>
+    <error to="FailureNotification"/>
+</action>
+<action name="SanityCheckFailureNotification">
+	<email xmlns="uri:oozie:email-action:0.1">
+		<to>${emailToAddress}</to>
+        <subject>SanityCheckFailureNotification Notification</subject>
+        <body>Sanity Check Failures has exceeded volume allowance. Please investigate.</body>
+    </email>
+    <ok to="fail"/>
+    <error to="fail"/>
+</action>
+<action name="FailureNotification">
+	<email xmlns="uri:oozie:email-action:0.1">
+    	<to>${emailToAddress}</to>
+        <subject>Status of application - workflow id ${wf:id()} : Fail</subject>
+        <body>Something went wrong. Error message[${wf:errorMessage(wf:lastErrorNode())}]</body>
+	</email>
+    <ok to="fail"/>
+    <error to="fail"/>
+</action>
+<kill name="fail">
+	<message>Book recommendation system failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+</kill>
+<end name="end"/>
+</workflow-app>

@@ -1,0 +1,27 @@
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="Hive oozie task">
+<start to="FirstTask"/>
+<action name="FirstTask">
+	<hive xmlns="uri:oozie:hive-action:0.3">
+		<job-tracker>${jobTracker}</job-tracker>
+  		<name-node>${nameNode}</name-node>
+  		<script>${appPath}/hive/hive-file.hql</script>
+  		<param>use_db=${app_db}</param>
+	</hive>
+	<ok to="end"/>
+	<error to="FailureNotification"/>
+</action>
+<action name="FailureNotification">
+	<email xmlns="uri:oozie:email-action:0.1">
+    	<to>${emailToAddress}</to>
+        <subject>Task Failed - workflow id ${wf:id()}</subject>
+        <body>Something went wrong. Error message[${wf:errorMessage(wf:lastErrorNode())}]</body>
+    </email>
+    <ok to="end"/>
+    <error to="fail"/>
+</action>
+<kill name="fail">
+	<message>Task failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+</kill>
+<end name="end"/>
+</workflow-app>
+

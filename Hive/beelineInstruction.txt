@@ -1,0 +1,15 @@
+# log in cluster
+ssh -p 49233 username@rm.neutronmobile.com
+
+[root@master1 ~]# beeline
+
+beeline> !connect jdbc:hive2://192.168.1.13:10000/default
+
+Enter username for jdbc:hive2://192.168.1.13:10000/default: your login name
+
+Enter password for jdbc:hive2://192.168.1.13:10000/default: your password
+
+
+# you should see following command line
+
+0: jdbc:hive2://192.168.1.13:10000/default> 
