@@ -1,5 +1,4 @@
-# word count in storm
-Steps:
+# word count in storm Steps:
 1. A series of English sentences are built in Spout, and randomly emitted.
 2. Use one bolt to receive the tuples from Spout and then normalization processing is carried out, 
 which means splitting the sentence to words and emit the words.
