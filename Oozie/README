@@ -13,12 +13,12 @@ Oozie client build version: 4.2.0.2.3.2.0-2950
 1.check oozie status
 oozie admin -oozie http://worker1.nmobile.local:11000/oozie -status
 
-[jason@master1 ~]$ oozie admin -oozie http://worker1.nmobile.local:11000/oozie -status
+[guan01@master1 ~]$ oozie admin -oozie http://worker1.nmobile.local:11000/oozie -status
 System mode: NORMAL
-[jason@master1 ~]$
+[guan01@master1 ~]$
 
 2.run a oozie job
-oozie job -oozie http://worker1.nmobile.local:11000/oozie -config /home/jason/installation/dataapp/job.properties -run
+oozie job -oozie http://worker1.nmobile.local:11000/oozie -config /home/guan01/installation/dataapp/job.properties -run
 
 3.check job status
 check info and log 
