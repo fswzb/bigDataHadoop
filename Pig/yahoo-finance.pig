@@ -45,7 +45,7 @@ dump adjClosePlusTenCents;
 --sampling data
 sampleStock = SAMPLE stocks 0.01;
 store sampleStock into '/user/guan01/pig/sampleStock';
-hadoop fs -cat /user/guan01/pig/sampleStock/*
+--hadoop fs -cat /user/guan01/pig/sampleStock/*
 
 
 
