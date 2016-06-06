@@ -1,12 +1,14 @@
-'''
 running step:
 
 hadoop fs -copyFromLocal input.txt /user/cloudera/input.txt
-hadoop jar target/word-count-1.0.0.jar com.neutronmobile.word_count.WordCount /user/cloudera/input.txt /user/cloudera/output
-hadoop fs -cat /user/cloudera/output/*
-'''
 
-'''
+hadoop jar target/word-count-1.0.0.jar com.neutronmobile.word_count.WordCount /user/cloudera/input.txt /user/cloudera/output
+
+hadoop fs -cat /user/cloudera/output/*
+
+
+
+
 [cloudera@quickstart wordcount]$ hadoop jar target/word-count-1.0.0.jar com.neutronmobile.word_count.WordCount /user/cloudera/input.txt /user/cloudera/output
 16/06/05 14:19:20 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
 16/06/05 14:19:21 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
@@ -78,4 +80,3 @@ hadoop fs -cat /user/cloudera/output/*
 	File Output Format Counters 
 		Bytes Written=2921
 
-'''
