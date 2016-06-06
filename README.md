@@ -6,7 +6,7 @@ Most of the practice and projects are run in two environment:
 ssh -p 49233 guan01@rm.neutronmobile.com
 
 # Knowledge Summary 
-I divided what I learned priviously into several parts and summaried them in the file Knowledge Summary.pdf
+I divided what I learned priviously into several parts and summaried them in the file 'Knowledge Summary.pdf'
 
 # Topic folders
 I classified the material that I learned and projects I worked into different folders based on the topics.
