@@ -4,7 +4,6 @@ hadoop fs -copyFromLocal yahooFinance.csv /user/guan01/hive/yahooFinance
 hadoop fs -ls /user/guan01/hive/yahooFinance
 
 -- 2. beeline connection
--- 用户名跟cluster自己的用户名要一致，不然会有权限问题
 !connect jdbc:hive2://192.168.1.13:10000/default
 
 -- 3. create databases
