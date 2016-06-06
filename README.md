@@ -1,6 +1,8 @@
 # Running environment 
 Most of the practice and projects are run in two environment:
+
 (1) Local Cloudera VM: mainly used for testing
+
 (2) neutronmobile cluster provided by Neutron Mobile, Inc., is more like a production environment.
 
 ssh -p 49233 guan01@rm.neutronmobile.com
