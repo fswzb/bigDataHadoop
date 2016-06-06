@@ -1,3 +1,2 @@
 # yahoo finance
-1. Download stock history data from [a link]http://finance.yahoo.com
-2. Save as yahooFinance.csv
+Download stock history data from http://finance.yahoo.com and save as yahooFinance.csv
