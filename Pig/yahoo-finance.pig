@@ -16,7 +16,7 @@ describe stocks;
 
 --store
 store stocks into '/user/guan01/pig/stocks';
-hadoop fs -cat /user/guan01/pig/stocks/*
+-- hadoop fs -cat /user/guan01/pig/stocks/*
 
 --filter(find stocks that have close price than 40.0)
 closeGreaterThan40 = FILTER stocks by close >= 40.0;
